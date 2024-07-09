@@ -63,6 +63,31 @@ server <- function(input, output, session) {
     numSumdata()
   })
   
+  plotNumVars <- eventReactive(input$numPlotSum, {
+    input$numPlotSum
+    req(input$numPlotSum)
+    req(input$plotNum)
+    data <- getData()
+    plotData <- data |>
+      select("name", !!sym(input$plotNum)) |>
+      arrange(!!sym(input$plotNum)) |>
+      na.omit()
+    
+    return(plotData)
+  })
+  
+  output$scatterPlots <- renderPlot({
+    input$numPlotSum
+    req(plotNumVars())
+    req(input$numPlotSum)
+    scatterData <- plotNumVars()
+    yVar <- as.character(input$plotNum)
+    ggplot(scatterData, aes_string(x = "name", y = yVar)) +
+      geom_point() +
+      labs(x= "School Name", y = input$plotNum) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  })
+  
   contingencyTables <- eventReactive(input$contSum, {
     req(input$catVars)
     req(input$contSum)
