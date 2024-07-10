@@ -33,17 +33,20 @@ fluidPage(
                  p("In the State Selection tab, this will be where you select which
                    state's data you would like to look at. There will be a drop down tab
                    where you can select one of the six states. After selecting a state
-                   and clicking the Select State button, you will be able to see not only
+                   and clicking the Select State button, you will be able to see not
+                   only
                    the data from that state, but you can also download the data as a csv
                    file."),
-                 p("In the Data Exploration tab, this is where you will get the chance to
-                   look at some of the numerical/categorical variables in the dataset.
+                 p("In the Data Exploration tab, this is where you will get the chance
+                 to look at some of the numerical/categorical variables in the dataset.
                    For the numerical variables, you will get to see numerical summeries
                    as well as scatter plots detailing that varaible for each school. For
                    the categorical variables, you will see contingency tables and bar
                    plots. You will also be able to look at combinations of numerical and
                    categorical varibles to do more deep diving exploration"),
-                 p("I hope you enjoy this app, and start exploring!")
+                 p("I hope you enjoy this app, and start exploring!"),
+                 tags$img(src = "https://pre00.deviantart.net/7bc0/th/pre/i/2018/142/8/0/seal_of_the_united_states_department_of_education2_by_yourdailydeviantart-dcc8oxv.png",
+                          height = "200px", width = "300px")
                )),
       tabPanel("State Selection",
                sidebarLayout(
@@ -51,6 +54,7 @@ fluidPage(
                    selectInput("state", h3("Select a State"),
                                choices = list("TX", "CA", "NY", "NC", "MA", "MI")),
                    actionButton("submit", "Choose State"),
+                   br(),
                    downloadButton("downloadData", "Download CSV File")
                  ),
                  
@@ -76,21 +80,28 @@ fluidPage(
                              choices = list("faculty_salary", 
                                             "tuition_revenue_per_fte")),
                  actionButton("numPlotSum", "Plot Numerical Variable"),
+                 br(),
                  checkboxGroupInput("catVars", "Choose Categorical Variables for
                                     Contingency Table",
                                     choices = list("accreditor_code", "ownership", 
                                                    "open_admissions_policy")),
-                 actionButton("contSum", "Generate Contingency Tables")
+                actionButton("contSum", "Generate Contingency Tables"),
+                br(),
+                selectInput("catPlots", "Choose Categorical Variable to Plot",
+                            choices = list("accreditor_code", "ownership", 
+                                           "open_admissions_policy")),
+                actionButton("barPlotSum", "Plot Categorical Variable")
+                 
                ),
                mainPanel(
                  textOutput("Data Exploration")
                )
              ),
              mainPanel(
-              textOutput("numText"),
               tableOutput("numTable"),
               plotOutput("scatterPlots"),
-              tableOutput("contTableOutput")
+              tableOutput("contTableOutput"),
+              plotOutput("barPlots")
             )
              
     )

@@ -48,14 +48,8 @@ server <- function(input, output, session) {
     req(input$numVariables)
     req(input$numSum)
     summaryVars <- select(getData(), all_of(input$numVariables))
-    results <- sapply(summaryVars, summary)
+    results <- summary(summaryVars)
     return(results)
-  })
-
-  output$numText <- renderText({
-    req(input$numSum)
-    paste("The numbers are as follows: Min, 1st Quartile, Median, Mean, 3rd Quartile,
-          Max. and the Number of missing values")
   })
   
   output$numTable <- renderTable({
@@ -63,8 +57,7 @@ server <- function(input, output, session) {
     numSumdata()
   })
   
-  plotNumVars <- eventReactive(input$numPlotSum, {
-    input$numPlotSum
+  plotNumVars <- reactive({
     req(input$numPlotSum)
     req(input$plotNum)
     data <- getData()
@@ -77,14 +70,13 @@ server <- function(input, output, session) {
   })
   
   output$scatterPlots <- renderPlot({
-    input$numPlotSum
     req(plotNumVars())
-    req(input$numPlotSum)
     scatterData <- plotNumVars()
     yVar <- as.character(input$plotNum)
     ggplot(scatterData, aes_string(x = "name", y = yVar)) +
       geom_point() +
-      labs(x= "School Name", y = input$plotNum) +
+      labs(x= "School Name", y = input$plotNum, title = paste("Scatter Plot for",
+                                                             input$plotNum) ) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1))
   })
   
@@ -102,5 +94,24 @@ server <- function(input, output, session) {
   output$contTableOutput <- renderTable({
     req(input$contSum)
     contingencyTables()
+  })
+  
+  plotCatVars <- reactive({
+    req(input$catPlots)
+    req(input$barPlotSum)
+    data <- getData() |>
+      select(!!sym(input$catPlots)) |>
+      na.omit() |>
+      mutate(across(everything(), as.factor))
+  })
+  
+  output$barPlots <- renderPlot({
+    req(plotCatVars())
+    barData <- plotCatVars()
+    xVar <- colnames(barData)
+    xlab <- as.character(input$catPlots)
+    ggplot(barData, aes_string(x = xVar)) +
+      geom_bar() +
+      labs(x = xlab, y = "Count", title = paste("Bar Plot for", input$catPlots))
   })
 }
